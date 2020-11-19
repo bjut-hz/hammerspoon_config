@@ -1,5 +1,27 @@
 local hotkey = require "hs.hotkey"
 local alert = require "hs.alert"
+local window = require "hs.window"
+local mouse = require "hs.mouse"
+
+
+local function mouseHighlight()
+    if mouseCircle then
+        mouseCircle:delete()
+        if mouseCircleTimer then
+            mouseCircleTimer:stop()
+        end
+    end
+    mousepoint = hs.mouse.getAbsolutePosition()
+    mouseCircle = hs.drawing.circle(hs.geometry.rect(mousepoint.x-40, mousepoint.y-40, 80, 80))
+    mouseCircle:setStrokeColor({["red"]=1,["blue"]=0,["green"]=0,["alpha"]=1})
+    mouseCircle:setFill(false)
+    mouseCircle:setStrokeWidth(5)
+    mouseCircle:bringToFront(true)
+    mouseCircle:show()
+
+    mouseCircleTimer = hs.timer.doAfter(3, function() mouseCircle:delete() end)
+end
+
 
 -- 绑定指定的显示器id
 local function bindMouseToMonitor(monitor_id)
@@ -22,3 +44,11 @@ hotkey.bind(hyperCtrl, "Left", bindMouseToMonitor(LEFT_MONITOR))
 hotkey.bind(hyperCtrl, "Down", bindMouseToMonitor(MAC_MONITOR))
 -- Up对应上侧的显示器
 hotkey.bind(hyperCtrl, "Up", bindMouseToMonitor(UPPER_MONITOR))
+
+
+-- 循环移动鼠标
+hotkey.bind(hyperCtrl, "Right", function()
+    local current_screen = mouse.getCurrentScreen()
+    local next_screen = getMonitor(MONITOR_ORDER[current_screen:id()])
+    focusScreen(next_screen)
+end)

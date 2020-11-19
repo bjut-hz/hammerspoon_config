@@ -13,7 +13,9 @@ local mouse = require "hs.mouse"
 -- default 0.2
 window.animationDuration = 0
 
-function toggleMaximize()
+-- defines for window maximize toggler
+local frameCache = {}
+local function toggleMaximize()
     local win = window.focusedWindow()
     if frameCache[win:id()] then
         win:setFrame(frameCache[win:id()])
@@ -25,7 +27,7 @@ function toggleMaximize()
 end
 
 --Predicate that checks if a window belongs to a screen
-function isInScreen(screen, win)
+local function isInScreen(screen, win)
     return win:screen() == screen
 end
 
@@ -45,17 +47,21 @@ function focusScreen(screen)
 end
 
 -- maximized active window and move to selected monitor
-function moveTo(win, n)
-    local screens = screen.allScreens()
-    if n > #screens then
-        alert.show("Only " .. #screens .. " monitors ")
-    else
-        local toWin = screen.allScreens()[n]:name()
-        alert.show("Move " .. win:application():name() .. " to " .. toWin)
 
-        layout.apply({{nil, win:title(), toWin, layout.maximized, nil, nil}})
+local function moveTo(window, monitor)
+    local is_full_screen = window:isFullScreen()
+    if is_full_screen then
+        -- 先退出全屏状态移动后再全屏
+        window:toggleFullScreen()
+    end
+
+    window:moveToScreen(monitor, false, true)
+
+    if is_full_screen then
+        window:toggleFullScreen()
     end
 end
+
 
 
 local function bindWindowToMonitor(monitor_id)
@@ -66,27 +72,13 @@ local function bindWindowToMonitor(monitor_id)
             return
         end
 
-        local current_window = window.focusedWindow()
-        local is_full_screen = current_window:isFullScreen()
-        if is_full_screen then
-            -- 先退出全屏状态移动后再全屏
-            current_window:toggleFullScreen()
-        end
-
-        window.focusedWindow():moveToScreen(monitor, false, true)
-
-        if is_full_screen then
-            current_window:toggleFullScreen()
-        end
-
-
-        -- 鼠标移动到指定显示器
+        moveTo(window.focusedWindow(), monitor)
         focusScreen(monitor)
     end
 end
 
 -- left half
-hotkey.bind(hyper, "Left", function()
+hotkey.bind(hyper, "J", function()
   if window.focusedWindow() then
     window.focusedWindow():moveToUnit(layout.left50)
   else
@@ -95,17 +87,17 @@ hotkey.bind(hyper, "Left", function()
 end)
 
 -- right half
-hotkey.bind(hyper, "Right", function()
+hotkey.bind(hyper, "L", function()
   window.focusedWindow():moveToUnit(layout.right50)
 end)
 
 -- top half
-hotkey.bind(hyper, "Up", function()
+hotkey.bind(hyper, "I", function()
   window.focusedWindow():moveToUnit'[0,0,100,50]'
 end)
 
 -- bottom half
-hotkey.bind(hyper, "Down", function()
+hotkey.bind(hyper, "K", function()
   window.focusedWindow():moveToUnit'[0,50,100,100]'
 end)
 
@@ -142,19 +134,6 @@ end)
 -- maximize window
 hotkey.bind(hyper, 'M', function() toggleMaximize() end)
 
--- defines for window maximize toggler
-local frameCache = {}
--- toggle a window between its normal size, and being maximized
-function toggle_maximize()
-    local win = window.focusedWindow()
-    if frameCache[win:id()] then
-        win:setFrame(frameCache[win:id()])
-        frameCache[win:id()] = nil
-    else
-        frameCache[win:id()] = win:frame()
-        win:maximize()
-    end
-end
 
 -- display a keyboard hint for switching focus to each window
 hotkey.bind(hyperShift, '/', function()
@@ -170,8 +149,17 @@ end)
 
 
 -- 移动窗口及鼠标到指定显示器,并保持窗口状态(全屏)
-hotkey.bind(hyperShift, "Left", bindWindowToMonitor(LEFT_MONITOR))
+hotkey.bind(hyper, "Left", bindWindowToMonitor(LEFT_MONITOR))
 
-hotkey.bind(hyperShift, "Down", bindWindowToMonitor(MAC_MONITOR))
+hotkey.bind(hyper, "Down", bindWindowToMonitor(MAC_MONITOR))
 
-hotkey.bind(hyperShift, "Up", bindWindowToMonitor(UPPER_MONITOR))
+hotkey.bind(hyper, "Up", bindWindowToMonitor(UPPER_MONITOR))
+
+-- 循环移动窗口
+hotkey.bind(hyper, "Right", function()
+    local current_window = window.focusedWindow()
+    local current_screen = current_window:screen()
+    local next_screen = getMonitor(MONITOR_ORDER[current_screen:id()])
+    moveTo(current_window, next_screen)
+    focusScreen(next_screen)
+end)

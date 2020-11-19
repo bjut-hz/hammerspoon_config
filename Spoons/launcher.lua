@@ -8,12 +8,7 @@ local fnutils = require "hs.fnutils"
 grid.setMargins({0, 0})
 
 applist = {
-    {shortcut = 'I',appname = 'GoLand'},
-    {shortcut = 'C',appname = 'Google Chrome'},
-    {shortcut = 'K',appname = 'iTerm'},
-    {shortcut = 'D',appname = 'Finder'},
-    {shortcut = 'Y',appname = 'Activity Monitor'},
-    {shortcut = 'P',appname = 'System Preferences'},
+    {shortcut = 'G',appname = 'GoLand'},
 }
 
 fnutils.each(applist, function(entry)
