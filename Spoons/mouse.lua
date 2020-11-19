@@ -24,11 +24,11 @@ end
 
 
 -- 绑定指定的显示器id
-local function bindMouseToMonitor(monitor_id)
+local function bindMouseToMonitor(monitor_name)
     return function ()
-        local monitor = getMonitor(monitor_id)
+        local monitor = getMonitor(monitor_name)
         if not monitor then
-            alert.show(string.format("[bindMouseToMonitor]invalid monitor id: %d", monitor_id))
+            alert.show(string.format("[bindMouseToMonitor]invalid monitor id: %d", monitor_name))
             return
         end
 
@@ -49,6 +49,6 @@ hotkey.bind(hyperCtrl, "Up", bindMouseToMonitor(UPPER_MONITOR))
 -- 循环移动鼠标
 hotkey.bind(hyperCtrl, "Right", function()
     local current_screen = mouse.getCurrentScreen()
-    local next_screen = getMonitor(MONITOR_ORDER[current_screen:id()])
+    local next_screen = getMonitor(MONITOR_ORDER[current_screen:name()])
     focusScreen(next_screen)
 end)

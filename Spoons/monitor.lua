@@ -6,24 +6,28 @@ local monitorID2NameMap = {
     [724072916] = "DELL U2718QM",
 }
 
--- 我的显示器id
-LEFT_MONITOR = 722482643
-UPPER_MONITOR = 724072916
-MAC_MONITOR = 69734662
+-- 我的显示器Name
+LEFT_MONITOR = "DELL P2719HC"
+UPPER_MONITOR = "DELL U2718QM"
+MAC_MONITOR = "Color LCD"
 
 -- 显示器的顺序显示
 MONITOR_ORDER = {
-    [722482643] = 724072916,
-    [724072916] = 69734662,
-    [69734662] = 722482643,
+    [LEFT_MONITOR] = UPPER_MONITOR,
+    [UPPER_MONITOR] = MAC_MONITOR,
+    [MAC_MONITOR] = LEFT_MONITOR,
 }
 
-function getMonitor(monitor_id)
+function getMonitor(monitor_name)
     for _, v in ipairs(screen.allScreens()) do
-        if v:id() == monitor_id then
+        if v:name() == monitor_name then
             return v
         end
     end
+end
+
+for _, v in ipairs(screen.allScreens()) do
+    print(v:id(), v:name())
 end
 
 

@@ -65,11 +65,11 @@ end
 
 
 
-local function bindWindowToMonitor(monitor_id)
+local function bindWindowToMonitor(monitor_name)
     return function ()
-        local monitor = getMonitor(monitor_id)
+        local monitor = getMonitor(monitor_name)
         if not monitor then
-            alert.show(string.format("[bindWindowToMonitor]invalid monitor id: %d", monitor_id))
+            alert.show(string.format("[bindWindowToMonitor]invalid monitor id: %d", monitor_name))
             return
         end
 
@@ -160,7 +160,7 @@ hotkey.bind(hyper, "Up", bindWindowToMonitor(UPPER_MONITOR))
 hotkey.bind(hyper, "Right", function()
     local current_window = window.focusedWindow()
     local current_screen = current_window:screen()
-    local next_screen = getMonitor(MONITOR_ORDER[current_screen:id()])
+    local next_screen = getMonitor(MONITOR_ORDER[current_screen:name()])
     moveTo(current_window, next_screen)
     focusScreen(next_screen)
 end)
