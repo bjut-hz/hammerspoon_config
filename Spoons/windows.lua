@@ -1,18 +1,89 @@
 -- window management
-local application = require "hs.application"
 local hotkey = require "hs.hotkey"
+local hints = require "hs.hints"
 local window = require "hs.window"
 local layout = require "hs.layout"
-local grid = require "hs.grid"
-local hints = require "hs.hints"
 local screen = require "hs.screen"
 local alert = require "hs.alert"
 local fnutils = require "hs.fnutils"
 local geometry = require "hs.geometry"
 local mouse = require "hs.mouse"
 
+
 -- default 0.2
-window.animationDuration = 0.1
+window.animationDuration = 0
+
+function toggleMaximize()
+    local win = window.focusedWindow()
+    if frameCache[win:id()] then
+        win:setFrame(frameCache[win:id()])
+        frameCache[win:id()] = nil
+    else
+        frameCache[win:id()] = win:frame()
+        win:maximize()
+    end
+end
+
+--Predicate that checks if a window belongs to a screen
+function isInScreen(screen, win)
+    return win:screen() == screen
+end
+
+function focusScreen(screen)
+    --Get windows within screen, ordered from front to back.
+    --If no windows exist, bring focus to desktop. Otherwise, set focus on
+    --front-most application window.
+    local windows = fnutils.filter(
+            window.orderedWindows(),
+            fnutils.partial(isInScreen, screen))
+    local windowToFocus = #windows > 0 and windows[1] or window.desktop()
+    windowToFocus:focus()
+
+    -- move cursor to center of screen
+    local pt = geometry.rectMidPoint(screen:fullFrame())
+    mouse.setAbsolutePosition(pt)
+end
+
+-- maximized active window and move to selected monitor
+function moveTo(win, n)
+    local screens = screen.allScreens()
+    if n > #screens then
+        alert.show("Only " .. #screens .. " monitors ")
+    else
+        local toWin = screen.allScreens()[n]:name()
+        alert.show("Move " .. win:application():name() .. " to " .. toWin)
+
+        layout.apply({{nil, win:title(), toWin, layout.maximized, nil, nil}})
+    end
+end
+
+
+local function bindWindowToMonitor(monitor_id)
+    return function ()
+        local monitor = getMonitor(monitor_id)
+        if not monitor then
+            alert.show(string.format("[bindWindowToMonitor]invalid monitor id: %d", monitor_id))
+            return
+        end
+
+        local current_window = window.focusedWindow()
+        local is_full_screen = current_window:isFullScreen()
+        if is_full_screen then
+            -- 先退出全屏状态移动后再全屏
+            current_window:toggleFullScreen()
+        end
+
+        window.focusedWindow():moveToScreen(monitor, false, true)
+
+        if is_full_screen then
+            current_window:toggleFullScreen()
+        end
+
+
+        -- 鼠标移动到指定显示器
+        focusScreen(monitor)
+    end
+end
 
 -- left half
 hotkey.bind(hyper, "Left", function()
@@ -69,7 +140,7 @@ hotkey.bind(hyper, 'C', function()
 end)
 
 -- maximize window
-hotkey.bind(hyper, 'M', function() toggle_maximize() end)
+hotkey.bind(hyper, 'M', function() toggleMaximize() end)
 
 -- defines for window maximize toggler
 local frameCache = {}
@@ -97,80 +168,10 @@ hotkey.bind(hyperShift, "H", function()
   window.switcher.nextWindow()
 end)
 
--- move active window to previous monitor
-hotkey.bind(hyperShift, "Left", function()
-  window.focusedWindow():moveOneScreenWest()
-end)
 
--- move active window to next monitor
-hotkey.bind(hyperShift, "Right", function()
-  window.focusedWindow():moveOneScreenEast()
-end)
+-- 移动窗口及鼠标到指定显示器,并保持窗口状态(全屏)
+hotkey.bind(hyperShift, "Left", bindWindowToMonitor(LEFT_MONITOR))
 
--- move cursor to previous monitor
-hotkey.bind(hyperCtrl, "Left", function ()
-  -- focusScreen(window.focusedWindow():screen():previous())
-  focusScreen(screen.allScreens()[3])
-end)
+hotkey.bind(hyperShift, "Down", bindWindowToMonitor(MAC_MONITOR))
 
--- move cursor to next monitor
-hotkey.bind(hyperCtrl, "Down", function ()
-  -- focusScreen(window.focusedWindow():screen():next())
-  focusScreen(screen.allScreens()[1])
-end)
-
-hotkey.bind(hyperCtrl, "Up", function ()
-  -- focusScreen(window.focusedWindow():screen():next())
-  focusScreen(screen.allScreens()[2])
-end)
-
-
---Predicate that checks if a window belongs to a screen
-function isInScreen(screen, win)
-  return win:screen() == screen
-end
-
-function focusScreen(screen)
-  --Get windows within screen, ordered from front to back.
-  --If no windows exist, bring focus to desktop. Otherwise, set focus on
-  --front-most application window.
-  local windows = fnutils.filter(
-      window.orderedWindows(),
-      fnutils.partial(isInScreen, screen))
-  local windowToFocus = #windows > 0 and windows[1] or window.desktop()
-  windowToFocus:focus()
-
-  -- move cursor to center of screen
-  local pt = geometry.rectMidPoint(screen:fullFrame())
-  mouse.setAbsolutePosition(pt)
-end
-
--- maximized active window and move to selected monitor
-moveto = function(win, n)
-  local screens = screen.allScreens()
-  if n > #screens then
-    alert.show("Only " .. #screens .. " monitors ")
-  else
-    local toWin = screen.allScreens()[n]:name()
-    alert.show("Move " .. win:application():name() .. " to " .. toWin)
-
-    layout.apply({{nil, win:title(), toWin, layout.maximized, nil, nil}})
-    
-  end
-end
-
--- move cursor to monitor 1 and maximize the window
-hotkey.bind(hyperShift, "1", function()
-  local win = window.focusedWindow()
-  moveto(win, 1)
-end)
-
-hotkey.bind(hyperShift, "2", function()
-  local win = window.focusedWindow()
-  moveto(win, 2)
-end)
-
-hotkey.bind(hyperShift, "3", function()
-  local win = window.focusedWindow()
-  moveto(win, 3)
-end)
+hotkey.bind(hyperShift, "Up", bindWindowToMonitor(UPPER_MONITOR))
