@@ -52,14 +52,15 @@ local function moveTo(window, monitor)
     local is_full_screen = window:isFullScreen()
     if is_full_screen then
         -- 先退出全屏状态移动后再全屏
-        window:toggleFullScreen()
+        window = window:toggleFullScreen()
     end
 
-    window:moveToScreen(monitor, false, true)
+    window = window:moveToScreen(monitor, false, true)
 
     if is_full_screen then
-        window:toggleFullScreen()
+        window:toggleFullScreen():isFullScreen()
     end
+    return window
 end
 
 
