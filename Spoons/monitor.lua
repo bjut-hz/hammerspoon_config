@@ -1,11 +1,5 @@
 local screen = require "hs.screen"
 
-local monitorID2NameMap = {
-    [69734662] = "Color LCD",
-    [722482643] = "DELL P2719HC",
-    [724072916] = "DELL U2718QM",
-}
-
 -- 我的显示器Name
 LEFT_MONITOR = "DELL P2719HC"
 UPPER_MONITOR = "DELL U2718QM"
