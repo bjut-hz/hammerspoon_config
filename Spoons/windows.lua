@@ -150,17 +150,15 @@ end)
 
 
 -- 移动窗口及鼠标到指定显示器,并保持窗口状态(全屏)
-hotkey.bind(hyper, "Left", bindWindowToMonitor(LEFT_MONITOR))
-
-hotkey.bind(hyper, "Down", bindWindowToMonitor(MAC_MONITOR))
-
-hotkey.bind(hyper, "Up", bindWindowToMonitor(UPPER_MONITOR))
+for key, monitor_name in pairs(MONITOR_HOT_KEY_TEMPLATE) do
+    hotkey.bind(hyper, key, bindWindowToMonitor(monitor_name))
+end
 
 -- 循环移动窗口
 hotkey.bind(hyper, "Right", function()
     local current_window = window.focusedWindow()
     local current_screen = current_window:screen()
-    local next_screen = getMonitor(MONITOR_ORDER[current_screen:name()])
+    local next_screen = getMonitor(MONITOR_CIRCLE_ORDER[current_screen:name()])
     moveTo(current_window, next_screen)
     focusScreen(next_screen)
 end)

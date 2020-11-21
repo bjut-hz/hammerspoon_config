@@ -45,10 +45,15 @@ hotkey.bind(hyperCtrl, "Down", bindMouseToMonitor(MAC_MONITOR))
 -- Up对应上侧的显示器
 hotkey.bind(hyperCtrl, "Up", bindMouseToMonitor(UPPER_MONITOR))
 
+-- 移动窗口及鼠标到指定显示器,并保持窗口状态(全屏)
+for key, monitor_name in pairs(MONITOR_HOT_KEY_TEMPLATE) do
+    hotkey.bind(hyperCtrl, key, bindMouseToMonitor(monitor_name))
+end
+
 
 -- 循环移动鼠标
 hotkey.bind(hyperCtrl, "Right", function()
     local current_screen = mouse.getCurrentScreen()
-    local next_screen = getMonitor(MONITOR_ORDER[current_screen:name()])
+    local next_screen = getMonitor(MONITOR_CIRCLE_ORDER[current_screen:name()])
     focusScreen(next_screen)
 end)

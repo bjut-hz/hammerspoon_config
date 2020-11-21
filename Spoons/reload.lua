@@ -2,8 +2,9 @@ local pathwatcher = require "hs.pathwatcher"
 local alert = require "hs.alert"
 
 -- http://www.hammerspoon.org/go/#fancyreload
-function reloadConfig(files)
-	doReload = false
+local function reloadConfig(files, flagTables)
+	alert.show("Hammerspoon Config Hot Reloaded")
+	local doReload = false
 	for _, file in pairs(files) do
 		if file:sub(-4) == ".lua" then
 			doReload = true
@@ -14,5 +15,5 @@ function reloadConfig(files)
 	end
 end
 
-pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon", reloadConfig):start()
-alert.show("Hammerspoon Config Reloaded")
+local watched_path = os.getenv("HOME") .. "/.hammerspoon/"
+pathwatcher.new(watched_path, reloadConfig):start()
