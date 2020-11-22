@@ -18,18 +18,16 @@ local alert = require "hs.alert"
 local pathwatcher = require "hs.pathwatcher"
 local screen = require "hs.screen"
 local screen_watcher = require "hs.screen.watcher"
+local notify = require "hs.notify"
 
 screen_watcher.new(function()
     if #screen.allScreens() ~= MONITOR_NUM then
-        --alert.show("Hammerspoon Config Hot Reloaded")
-        hs.notify.show("🖥💻🖥", "Config Hot Reloaded", "monitor changed")
+        notify.show("🖥💻🖥", "Config Hot Reloaded", "monitor changed")
         hs.reload()
     end
 end):start()
 
-
 pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", function(files, flagTables)
-
     local doReload = false
     for _, file in pairs(files) do
         if file:sub(-4) == ".lua" then
@@ -38,7 +36,7 @@ pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", function(files, flagTable
         end
     end
     if doReload then
-        hs.notify.show("🔨🔨🔨", "Config Hot Reloaded", "lua file changed")
+        notify.show("🔨🔨🔨", "Config Hot Reloaded", "lua file changed")
         hs.reload()
     end
 end):start()
