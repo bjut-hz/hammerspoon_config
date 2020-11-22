@@ -3,7 +3,6 @@ local alert = require "hs.alert"
 
 MAC_MONITOR = "Color LCD"
 
-
 MONITOR_HOT_KEY_TEMPLATE = {
     ["Down"] = MAC_MONITOR,
 }
@@ -31,7 +30,11 @@ local function monitor_init()
         print("monitor name: " .. v:name())
     end
 
-    if MONITOR_NUM == 2 then
+    if MONITOR_NUM == 1 then
+        MONITOR_CIRCLE_ORDER = {
+            [MAC_MONITOR] = MAC_MONITOR
+        }
+    elseif MONITOR_NUM == 2 then
         for monitor_name, _ in pairs(monitor_map) do
             if monitor_name ~= MAC_MONITOR then
             --   new monitor, as UPPER_MONITOR

@@ -27,6 +27,7 @@ screen_watcher.new(function()
     end
 end):start()
 
+
 pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", function(files, flagTables)
     local doReload = false
     for _, file in pairs(files) do
@@ -35,6 +36,7 @@ pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", function(files, flagTable
             break
         end
     end
+
     if doReload then
         notify.show("🔨🔨🔨", "Config Hot Reloaded", "lua file changed")
         hs.reload()
