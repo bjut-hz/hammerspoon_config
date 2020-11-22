@@ -2,6 +2,7 @@ local hotkey = require "hs.hotkey"
 local alert = require "hs.alert"
 local window = require "hs.window"
 local mouse = require "hs.mouse"
+local notify = require "hs.notify"
 
 
 local function mouseHighlight()
@@ -28,7 +29,7 @@ local function bindMouseToMonitor(monitor_name)
     return function ()
         local monitor = getMonitor(monitor_name)
         if not monitor then
-            alert.show(string.format("[bindMouseToMonitor]invalid monitor id: %d", monitor_name))
+            notify.show("🔨🔨🔨", string.format("[bindMouseToMonitor]invalid monitor id: %s", monitor_name), "")
             return
         end
 
@@ -37,15 +38,6 @@ local function bindMouseToMonitor(monitor_name)
 end
 
 -- 移动鼠标至指定的显示器
--- 根据显示器位置设置快捷键
--- Left键对应左侧显示器
-hotkey.bind(hyperCtrl, "Left", bindMouseToMonitor(LEFT_MONITOR))
--- Down对应mac的显示器
-hotkey.bind(hyperCtrl, "Down", bindMouseToMonitor(MAC_MONITOR))
--- Up对应上侧的显示器
-hotkey.bind(hyperCtrl, "Up", bindMouseToMonitor(UPPER_MONITOR))
-
--- 移动窗口及鼠标到指定显示器,并保持窗口状态(全屏)
 for key, monitor_name in pairs(MONITOR_HOT_KEY_TEMPLATE) do
     hotkey.bind(hyperCtrl, key, bindMouseToMonitor(monitor_name))
 end
