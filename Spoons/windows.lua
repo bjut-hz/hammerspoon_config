@@ -9,6 +9,11 @@ local fnutils = require "hs.fnutils"
 local geometry = require "hs.geometry"
 local mouse = require "hs.mouse"
 
+local function sleep(ms)  -- ms
+    local n_time = os.clock() * 1000 + ms
+    repeat until (os.clock() * 1000) > n_time
+end
+
 
 -- default 0.2
 window.animationDuration = 0
@@ -48,17 +53,19 @@ end
 
 -- maximized active window and move to selected monitor
 
-local function moveTo(window, monitor)
+function moveTo(window, monitor)
     local is_full_screen = window:isFullScreen()
     if is_full_screen then
         -- 先退出全屏状态移动后再全屏
         window = window:toggleFullScreen()
+        sleep(1000)
     end
 
     window = window:moveToScreen(monitor, false, true)
 
     if is_full_screen then
-        window:toggleFullScreen():isFullScreen()
+        print(window:title(), window:toggleFullScreen():isFullScreen())
+        sleep(400)
     end
     return window
 end
@@ -69,7 +76,7 @@ local function bindWindowToMonitor(monitor_name)
     return function ()
         local monitor = getMonitor(monitor_name)
         if not monitor then
-            alert.show(string.format("[bindWindowToMonitor]invalid monitor id: %d", monitor_name))
+            alert.show(string.format("[bindWindowToMonitor]invalid monitor id: %s", monitor_name))
             return
         end
 
@@ -125,6 +132,7 @@ end)
 -- full screen
 hotkey.bind(hyper, 'F', function() 
   window.focusedWindow():toggleFullScreen()
+  sleep(800)
 end)
 
 -- center window

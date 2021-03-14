@@ -1,7 +1,7 @@
 local screen = require "hs.screen"
 local alert = require "hs.alert"
 
-MAC_MONITOR = "Color LCD"
+MAC_MONITOR = "Built-in Retina Display"
 
 MONITOR_HOT_KEY_TEMPLATE = {
     ["Down"] = MAC_MONITOR,
