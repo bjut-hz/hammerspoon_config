@@ -44,7 +44,7 @@ end
 
 
 -- 循环移动鼠标
-hotkey.bind(hyperCtrl, "Right", function()
+hotkey.bind(hyperCtrl, "space", function()
     local current_screen = mouse.getCurrentScreen()
     local next_screen = getMonitor(MONITOR_CIRCLE_ORDER[current_screen:name()])
     focusScreen(next_screen)

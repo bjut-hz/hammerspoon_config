@@ -38,43 +38,43 @@ local function monitor_init()
         for monitor_name, _ in pairs(monitor_map) do
             if monitor_name ~= MAC_MONITOR then
             --   new monitor, as UPPER_MONITOR
-                UPPER_MONITOR = monitor_name
-                MONITOR_HOT_KEY_TEMPLATE["Up"] = UPPER_MONITOR
+                FIRST_MONITOR = monitor_name
+                MONITOR_HOT_KEY_TEMPLATE["Up"] = FIRST_MONITOR
 
 
                 MONITOR_CIRCLE_ORDER = {
-                    [UPPER_MONITOR] = MAC_MONITOR,
-                    [MAC_MONITOR] = UPPER_MONITOR,
+                    [FIRST_MONITOR] = MAC_MONITOR,
+                    [MAC_MONITOR] = FIRST_MONITOR,
                 }
             end
         end
 
     elseif MONITOR_NUM == 3 then
         -- 预定义的模板
-        LEFT_MONITOR = "DELL P2719HC"
-        UPPER_MONITOR = "DELL U2718QM"
+        FIRST_MONITOR = "DELL U2718QM"
+        SECOND_MONITOR = "DELL P2719HC"
 
-        if not (monitor_map[LEFT_MONITOR] and monitor_map[UPPER_MONITOR]) then
-            LEFT_MONITOR = nil
-            UPPER_MONITOR = nil
+        if not (monitor_map[SECOND_MONITOR] and monitor_map[FIRST_MONITOR]) then
+            SECOND_MONITOR = nil
+            FIRST_MONITOR = nil
             for monitor_name, _ in pairs(monitor_map) do
                 if monitor_name ~= MAC_MONITOR then
-                    if not LEFT_MONITOR then
-                        LEFT_MONITOR = monitor_name
+                    if not SECOND_MONITOR then
+                        SECOND_MONITOR = monitor_name
                     else
-                        UPPER_MONITOR = monitor_name
+                        FIRST_MONITOR = monitor_name
                     end
                 end
             end
         end
 
-        MONITOR_HOT_KEY_TEMPLATE["Up"] = UPPER_MONITOR
-        MONITOR_HOT_KEY_TEMPLATE["Left"] = LEFT_MONITOR
+        MONITOR_HOT_KEY_TEMPLATE["Right"] = FIRST_MONITOR
+        MONITOR_HOT_KEY_TEMPLATE["Left"] = SECOND_MONITOR
 
         MONITOR_CIRCLE_ORDER = {
-            [LEFT_MONITOR] = UPPER_MONITOR,
-            [UPPER_MONITOR] = MAC_MONITOR,
-            [MAC_MONITOR] = LEFT_MONITOR,
+            [SECOND_MONITOR] = FIRST_MONITOR,
+            [FIRST_MONITOR] = MAC_MONITOR,
+            [MAC_MONITOR] = SECOND_MONITOR,
         }
 
     else

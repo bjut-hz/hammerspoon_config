@@ -163,7 +163,7 @@ for key, monitor_name in pairs(MONITOR_HOT_KEY_TEMPLATE) do
 end
 
 -- 循环移动窗口
-hotkey.bind(hyper, "Right", function()
+hotkey.bind(hyper, "space", function()
     local current_window = window.focusedWindow()
     local current_screen = current_window:screen()
     local next_screen = getMonitor(MONITOR_CIRCLE_ORDER[current_screen:name()])
